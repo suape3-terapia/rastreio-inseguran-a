@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rastreio de Insegurança | Sueli Pedroso - Terapeuta Sistêmica</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+  :root{
+    --rosa-clarissimo:#FDF1F5;
+    --rosa-claro:#F6D9E3;
+    --rosa-medio:#E3A8C0;
+    --rosa-forte:#C25E85;
+    --rosa-escuro:#8E3A5C;
+    --lilas:#C9A8D8;
+    --lilas-escuro:#9575CD;
+    --texto:#4A2C3A;
+    --texto-suave:#7A5568;
+    --branco:#FFFFFF;
+    --erro:#C0392B;
+    --sombra: 0 8px 30px rgba(142,58,92,0.15);
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    font-family:'Georgia','Times New Roman',serif;
+    background: linear-gradient(160deg, var(--rosa-clarissimo) 0%, #F3E6EF 100%);
+    color:var(--texto);
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    line-height:1.6;
+  }
+  .app{
+    width:100%;
+    max-width:560px;
+    background:var(--branco);
+    border-radius:24px;
+    box-shadow:var(--sombra);
+    overflow:hidden;
+    position:relative;
+  }
+  .header-logo{
+    display:flex;
+    justify-content:center;
+    padding:28px 0 10px;
+    background: linear-gradient(135deg, var(--rosa-claro), var(--rosa-clarissimo));
+  }
+  .header-logo img{
+    width:80px;
+    height:80px;
+    border-radius:50%;
+    object-fit:cover;
+    border:3px solid var(--branco);
+    box-shadow:0 4px 14px rgba(142,58,92,0.25);
+  }
+  .screen{
+    display:none;
+    padding:30px 32px 36px;
+    animation: fadeIn 0.4s ease;
+  }
+  .screen.active{display:block;}
+  @keyframes fadeIn{
+    from{opacity:0; transform:translateY(8px);}
+    to{opacity:1; transform:translateY(0);}
+  }
+  h1{
+    font-size:1.5rem;
+    color:var(--rosa-escuro);
+    text-align:center;
+    margin-bottom:14px;
+    font-weight:700;
+    line-height:1.35;
+  }
+  h2{
+    font-size:1.25rem;
+    color:var(--rosa-escuro);
+    margin-bottom:16px;
+    text-align:center;
+  }
+  .subtitulo{
+    text-align:center;
+    color:var(--texto-suave);
+    font-size:0.98rem;
+    margin-bottom:22px;
+  }
+  .intro-texto{
+    font-size:0.98rem;
+    color:var(--texto-suave);
+    margin-bottom:24px;
+  }
+  .intro-texto p{margin-bottom:12px;}
+  .btn{
+    display:block;
+    width:100%;
+    padding:15px 20px;
+    border:none;
+    border-radius:14px;
+    background: linear-gradient(135deg, var(--rosa-forte), var(--rosa-escuro));
+    color:var(--branco);
+    font-size:1.02rem;
+    font-family:inherit;
+    font-weight:600;
+    cursor:pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    box-shadow:0 6px 16px rgba(142,58,92,0.3);
+  }
+  .btn:hover{transform:translateY(-2px); box-shadow:0 8px 20px rgba(142,58,92,0.4);}
+  .btn:active{transform:translateY(0);}
+  .btn-secundario{
+    background:var(--branco);
+    color:var(--rosa-escuro);
+    border:2px solid var(--rosa-medio);
+    box-shadow:none;
+    margin-top:12px;
+  }
+  .btn-whats{
+    background: linear-gradient(135deg, #E3A8C0, #C9A8D8);
+    margin-top:12px;
+  }
+  .progress-container{
+    padding:16px 32px 0;
+  }
+  .progress-bar-bg{
+    width:100%;
+    height:8px;
+    background:var(--rosa-claro);
+    border-radius:10px;
+    overflow:hidden;
+  }
+  .progress-bar-fill{
+    height:100%;
+    background: linear-gradient(90deg, var(--rosa-forte), var(--lilas-escuro));
+    border-radius:10px;
+    transition: width 0.35s ease;
+  }
+  .progress-label{
+    text-align:center;
+    font-size:0.8rem;
+    color:var(--texto-suave);
+    margin-top:6px;
+    letter-spacing:0.5px;
+  }
+  .pergunta-texto{
+    font-size:1.15rem;
+    color:var(--texto);
+    margin-bottom:22px;
+    font-weight:600;
+    text-align:center;
+    line-height:1.5;
+  }
+  .opcoes{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+  }
+  .opcao{
+    display:block;
+    width:100%;
+    text-align:left;
+    padding:16px 18px;
+    border:2px solid var(--rosa-claro);
+    background:var(--rosa-clarissimo);
+    border-radius:14px;
+    font-family:inherit;
+    font-size:0.96rem;
+    color:var(--texto);
+    cursor:pointer;
+    transition: all 0.2s ease;
+  }
+  .opcao:hover{
+    border-color:var(--rosa-forte);
+    background:var(--rosa-claro);
+    transform:translateX(3px);
+  }
+  .form-group{
+    margin-bottom:18px;
+  }
+  .form-group label{
+    display:block;
+    font-size:0.9rem;
+    color:var(--texto-suave);
+    margin-bottom:6px;
+    font-weight:600;
+  }
+  .form-group input{
+    width:100%;
+    padding:13px 16px;
+    border:2px solid var(--rosa-claro);
+    border-radius:12px;
+    font-family:inherit;
+    font-size:0.98rem;
+    color:var(--texto);
+    background:var(--rosa-clarissimo);
+    transition: border-color 0.2s ease;
+  }
+  .form-group input:focus{
+    outline:none;
+    border-color:var(--rosa-forte);
+    background:var(--branco);
+  }
+  .form-group input.erro{
+    border-color:var(--erro);
+  }
+  .msg-erro{
+    color:var(--erro);
+    font-size:0.82rem;
+    margin-top:5px;
+    display:none;
+  }
+  .msg-erro.mostrar{display:block;}
+  .resultado-header{
+    text-align:center;
+    margin-bottom:20px;
+  }
+  .resultado-icone{
+    font-size:2.5rem;
+    margin-bottom:8px;
+  }
+  .perfil-nome{
+    font-size:1.4rem;
+    color:var(--rosa-escuro);
+    font-weight:700;
+    margin-bottom:6px;
+  }
+  .score-box{
+    display:inline-block;
+    background:var(--rosa-claro);
+    color:var(--rosa-escuro);
+    padding:6px 16px;
+    border-radius:20px;
+    font-size:0.88rem;
+    font-weight:600;
+    margin-bottom:18px;
+  }
+  .resultado-texto{
+    font-size:0.96rem;
+    color:var(--texto-suave);
+    margin-bottom:16px;
+  }
+  .resultado-texto strong{color:var(--texto);}
+  .caixa-pratica{
+    background:var(--rosa-clarissimo);
+    border-left:4px solid var(--rosa-forte);
+    padding:14px 16px;
+    border-radius:10px;
+    margin-bottom:20px;
+    font-size:0.92rem;
+    color:var(--texto);
+  }
+  .caixa-pratica h3{
+    font-size:0.85rem;
+    color:var(--rosa-escuro);
+    margin-bottom:8px;
+    text-transform:uppercase;
+    letter-spacing:0.5px;
+  }
+  .loading{
+    text-align:center;
+    padding:40px 20px;
+  }
+  .spinner{
+    width:40px;
+    height:40px;
+    border:4px solid var(--rosa-claro);
+    border-top:4px solid var(--rosa-forte);
+    border-radius:50%;
+    animation: spin 0.8s linear infinite;
+    margin:0 auto 16px;
+  }
+  @keyframes spin{
+    to{transform:rotate(360deg);}
+  }
+  .rodape-marca{
+    text-align:center;
+    padding:16px;
+    font-size:0.78rem;
+    color:var(--texto-suave);
+    border-top:1px solid var(--rosa-claro);
+  }
+  .rodape-marca strong{color:var(--rosa-escuro);}
+</style>
+</head>
+<body>
+
+<div class="app" id="app">
+
+  <div class="header-logo">
+    <img src="logo.jpeg" alt="Sueli Pedroso - Terapeuta Sistêmica">
+  </div>
+
+  <div class="progress-container" id="progressContainer" style="display:none;">
+    <div class="progress-bar-bg">
+      <div class="progress-bar-fill" id="progressFill" style="width:0%;"></div>
+    </div>
+    <div class="progress-label" id="progressLabel">Pergunta 1 de 10</div>
+  </div>
+
+  <!-- TELA 0: INTRO -->
+  <div class="screen active" id="screen-intro">
+    <h1>Você Se Sente Insegura(o) Sem Saber Por Quê?</h1>
+    <p class="subtitulo">Descubra a raiz da sua insegurança em poucos minutos</p>
+    <div class="intro-texto">
+      <p>A insegurança não nasce do nada. Ela se constrói — muitas vezes desde muito cedo — através de experiências, vínculos e padrões que aprendemos a repetir sem perceber.</p>
+      <p>Este rastreio foi desenvolvido com base em abordagens sistêmicas para te ajudar a identificar <strong>qual é o seu padrão de insegurança</strong> — e mostrar um caminho prático para começar a se relacionar de forma mais leve com você mesma(o).</p>
+      <p>São 10 perguntas rápidas. Ao final, você recebe seu perfil completo + um material em PDF personalizado para guardar.</p>
+    </div>
+    <button class="btn" onclick="iniciarRastreio()">Quero Descobrir Meu Perfil</button>
+  </div>
+
+  <!-- TELAS DE PERGUNTAS (geradas via JS) -->
+  <div class="screen" id="screen-perguntas">
+    <p class="pergunta-texto" id="perguntaTexto"></p>
+    <div class="opcoes" id="opcoesContainer"></div>
+  </div>
+
+  <!-- TELA DE CAPTURA -->
+  <div class="screen" id="screen-captura">
+    <h2>Falta pouco! 🌸</h2>
+    <p class="subtitulo">Preencha seus dados para ver seu resultado completo</p>
+
+    <div class="form-group">
+      <label for="inputNome">Nome completo</label>
+      <input type="text" id="inputNome" placeholder="Digite seu nome completo">
+      <div class="msg-erro" id="erroNome">Por favor, digite seu nome completo (mínimo 5 caracteres).</div>
+    </div>
+
+    <div class="form-group">
+      <label for="inputEmail">E-mail</label>
+      <input type="email" id="inputEmail" placeholder="seuemail@exemplo.com">
+      <div class="msg-erro" id="erroEmail">Por favor, digite um e-mail válido.</div>
+    </div>
+
+    <div class="form-group">
+      <label for="inputWhatsapp">WhatsApp (com DDD)</label>
+      <input type="text" id="inputWhatsapp" placeholder="Ex: 42984352645" maxlength="11">
+      <div class="msg-erro" id="erroWhatsapp">Digite um WhatsApp válido com DDD (ex: 42984352645).</div>
+    </div>
+
+    <button class="btn" onclick="validarEEnviar()">Ver Meu Resultado</button>
+  </div>
+
+  <!-- TELA DE CARREGAMENTO -->
+  <div class="screen" id="screen-loading">
+    <div class="loading">
+      <div class="spinner"></div>
+      <p style="color:var(--texto-suave);">Calculando seu perfil...</p>
+    </div>
+  </div>
+
+  <!-- TELA DE RESULTADO -->
+  <div class="screen" id="screen-resultado">
+    <div class="resultado-header">
+      <div class="resultado-icone" id="resultadoIcone">🌸</div>
+      <div class="perfil-nome" id="resultadoPerfilNome"></div>
+      <div class="score-box" id="resultadoScore"></div>
+    </div>
+    <div class="resultado-texto" id="resultadoDescricao"></div>
+    <div class="caixa-pratica">
+      <h3>O que isso significa na prática</h3>
+      <div id="resultadoPratica"></div>
+    </div>
+    <button class="btn" onclick="gerarPDF()">📄 Baixar PDF Completo</button>
+    <button class="btn btn-whats" onclick="abrirWhatsapp()">💬 Agendar Sessão com Sueli</button>
+  </div>
+
+  <div class="rodape-marca">
+    <strong>Sueli Pedroso</strong> — Terapeuta Sistêmica &nbsp;|&nbsp; @suape3_terapias
+  </div>
+
+</div>
+
+<script>
+/* ==========================================================
+   DADOS: PERGUNTAS
+   ========================================================== */
+const perguntas = [
+  {
+    texto: "Quando você recebe uma crítica, mesmo que pequena, o que geralmente acontece?",
+    opcoes: [
+      { texto: "Fico incomodada(o) na hora, mas consigo seguir em frente rápido", pontos: 1 },
+      { texto: "Fico remoendo aquilo por um bom tempo, revivendo a cena", pontos: 2 },
+      { texto: "Sinto que aquilo confirma algo que eu já \"sabia\" sobre mim", pontos: 3 }
+    ]
+  },
+  {
+    texto: "Como você se sente antes de tomar uma decisão importante?",
+    opcoes: [
+      { texto: "Um pouco ansiosa(o), mas confio no meu julgamento", pontos: 1 },
+      { texto: "Preciso ouvir a opinião de várias pessoas antes de decidir", pontos: 2 },
+      { texto: "Tenho muita dificuldade de decidir sozinha(o), sinto medo de errar", pontos: 3 }
+    ]
+  },
+  {
+    texto: "Com que frequência você se compara com outras pessoas?",
+    opcoes: [
+      { texto: "De vez em quando, sem me afetar muito", pontos: 1 },
+      { texto: "Com frequência, principalmente nas redes sociais", pontos: 2 },
+      { texto: "Quase o tempo todo — é quase automático", pontos: 3 }
+    ]
+  },
+  {
+    texto: "Quando alguém demora para responder sua mensagem, você pensa:",
+    opcoes: [
+      { texto: "\"Deve estar ocupado(a), sem problema\"", pontos: 1 },
+      { texto: "\"Será que eu fiz algo errado?\"", pontos: 2 },
+      { texto: "\"Com certeza fiz algo que afastou essa pessoa\"", pontos: 3 }
+    ]
+  },
+  {
+    texto: "Como você lida com elogios?",
+    opcoes: [
+      { texto: "Aceito com naturalidade e agradeço", pontos: 1 },
+      { texto: "Fico sem graça e tento minimizar", pontos: 2 },
+      { texto: "Não acredito muito neles, acho que a pessoa está sendo gentil", pontos: 3 }
+    ]
+  },
+  {
+    texto: "Em relacionamentos (amorosos, familiares ou de amizade), você costuma:",
+    opcoes: [
+      { texto: "Confiar no vínculo, mesmo com diferenças", pontos: 1 },
+      { texto: "Ter medo de ser abandonada(o) ou substituída(o)", pontos: 2 },
+      { texto: "Sentir que precisa se esforçar demais para ser amada(o)", pontos: 3 }
+    ]
+  },
+  {
+    texto: "Quando você olha para o espelho, o que vem primeiro à mente?",
+    opcoes: [
+      { texto: "Aceitação, mesmo notando pontos que gostaria de mudar", pontos: 1 },
+      { texto: "Uma lista mental de \"defeitos\"", pontos: 2 },
+      { texto: "Uma sensação de desconforto difícil de nomear", pontos: 3 }
+    ]
+  },
+  {
+    texto: "Pensando na sua família de origem, como eram reconhecidos seus esforços quando você era criança?",
+    opcoes: [
+      { texto: "Eu me sentia visto(a) e valorizado(a) na maior parte do tempo", pontos: 1 },
+      { texto: "O reconhecimento vinha só quando eu \"entregava resultados\"", pontos: 2 },
+      { texto: "Raramente sentia que era suficiente, independente do que fizesse", pontos: 3 }
+    ]
+  },
+  {
+    texto: "Diante de um erro seu, sua reação interna costuma ser:",
+    opcoes: [
+      { texto: "\"Errei, vou corrigir e seguir\"", pontos: 1 },
+      { texto: "\"Não posso errar, isso não é aceitável\"", pontos: 2 },
+      { texto: "\"Sou eu o problema, não só o erro\"", pontos: 3 }
+    ]
+  },
+  {
+    texto: "Se você pudesse descrever em uma palavra como se sente na maior parte do tempo em relação a si mesma(o), seria:",
+    opcoes: [
+      { texto: "Confiante (mesmo com dias ruins)", pontos: 1 },
+      { texto: "Insegura(o)", pontos: 2 },
+      { texto: "Insuficiente", pontos: 3 }
+    ]
+  }
+];
+
+/* ==========================================================
+   DADOS: PERFIS DE RESULTADO
+   ========================================================== */
+const perfis = {
+  perfil1: {
+    nome: "A Buscadora de Equilíbrio",
+    icone: "🌸",
+    faixa: "10 a 16",
+    descricao: "Sua insegurança aparece em momentos específicos — geralmente ligados a situações de pressão, cobrança ou mudança — mas não domina sua vida no dia a dia. Você tem uma base de autoconfiança relativamente sólida, construída ao longo do tempo, e consegue se recuperar com relativa rapidez depois de um tropeço emocional. Isso não significa que você não sofre com a insegurança — significa que ela ainda não sequestrou sua identidade.",
+    pratica: "Você está numa fase de ajuste fino, não de reconstrução. O trabalho aqui é sobre fortalecer ainda mais essa base, entender os gatilhos específicos que despertam a insegurança e criar ferramentas para atravessá-los com mais leveza — sem deixar que pequenos momentos de dúvida se transformem em crenças sobre quem você é.",
+    orientacoes: [
+      "Identifique por escrito as 3 situações que mais despertam sua insegurança.",
+      "Antes de reagir a um gatilho, pratique uma pausa de 10 segundos.",
+      "Crie o hábito de registrar 1 conquista por dia, por menor que seja.",
+      "Evite comparação nas redes sociais em horários de maior vulnerabilidade.",
+      "Considere sessões pontuais de terapia sistêmica para fortalecer ainda mais sua base emocional."
+    ]
+  },
+  perfil2: {
+    nome: "A Guardiã Cautelosa",
+    icone: "🌷",
+    faixa: "17 a 23",
+    descricao: "Você desenvolveu, ao longo da vida, uma espécie de vigilância constante — um estado de alerta que te faz antecipar julgamentos, rejeições ou decepções antes mesmo que elas aconteçam. Essa insegurança já não é pontual: ela aparece nas decisões, nos relacionamentos e na forma como você se enxerga. Muitas vezes você se cobra além do necessário, como uma forma (inconsciente) de evitar ser criticada(o) ou abandonada(o).",
+    pratica: "Esse padrão costuma ter uma função de proteção — em algum momento, estar em alerta foi uma forma de se manter segura(o) emocionalmente. O trabalho terapêutico aqui é entender de onde vem essa necessidade de controle e vigilância, e começar a construir novas formas de se relacionar consigo mesma(o) que não dependam tanto da validação externa.",
+    orientacoes: [
+      "Observe (sem julgar) os momentos em que você antecipa rejeição.",
+      "Pratique dizer \"não sei\" ou \"posso errar\" em voz alta — é treino, não fraqueza.",
+      "Reduza a busca por validação externa antes de tomar pequenas decisões.",
+      "Explore, com apoio terapêutico, a origem dessa vigilância constante.",
+      "Experimente a Constelação Sistêmica Familiar para mapear padrões herdados."
+    ]
+  },
+  perfil3: {
+    nome: "A Sobrevivente Silenciosa",
+    icone: "🌹",
+    faixa: "24 a 30",
+    descricao: "Sua insegurança não é um sentimento passageiro — ela se tornou, com o tempo, quase uma identidade. A sensação de \"nunca ser suficiente\" está presente em quase todas as áreas da sua vida: relacionamentos, trabalho, autoimagem, decisões. Isso geralmente tem raízes mais profundas, muitas vezes ligadas a experiências da infância ou a dinâmicas familiares onde o reconhecimento e o pertencimento não foram plenamente vividos.",
+    pratica: "Esse não é um padrão que se resolve com \"pensamento positivo\" — ele pede um olhar mais cuidadoso e, com frequência, um acompanhamento terapêutico que trabalhe as raízes sistêmicas dessa insegurança, não apenas os sintomas. Você não está \"quebrada(o)\" — você está carregando um peso que não é só seu, e que pode (e merece) ser trabalhado com apoio profissional.",
+    orientacoes: [
+      "Reconheça que esse padrão tem uma história — ele não é \"defeito de caráter\".",
+      "Evite se cobrar por \"não conseguir resolver sozinha(o)\" — isso é humano.",
+      "Busque acompanhamento terapêutico contínuo, não apenas pontual.",
+      "A Constelação Sistêmica Familiar pode ajudar a identificar lealdades invisíveis.",
+      "Considere também a Hipnose Sistêmica para acessar crenças mais profundas."
+    ]
+  }
+};
+
+const recursosComuns = "Acompanhamento com Sueli Pedroso — Terapeuta Sistêmica | Conteúdos sobre autoestima e padrões familiares no Instagram | Agendamento de sessão de avaliação.";
+
+/* ==========================================================
+   CONFIGURAÇÃO
+   ========================================================== */
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx9DQI2N4h2TeaeY-1-jwyvp6ZIE7fIXMUx9MfKh0asZnmWKdABATeRTW_q473VleXz1A/exec";
+const WHATSAPP_NUMERO = "5542984352645";
+const INSTAGRAM = "@suape3_terapias";
+const BIO = "Sou terapeuta sistêmica, meu trabalho auxilia pessoas a identificar a origem de conflitos emocionais e padrões repetitivos, promovendo mais consciência, equilíbrio, leveza e transformação em suas vidas.";
+
+// As imagens são carregadas em tempo de execução a partir dos arquivos
+// foto.jpeg e logo.jpeg (devem estar na MESMA pasta do index.html no GitHub).
+let FOTO_DATAURL = null;
+let LOGO_DATAURL = null;
+
+function carregarImagemComoDataURL(src, aoCarregar){
+  const img = new Image();
+  img.onload = function(){
+    try{
+      const canvas = document.createElement('canvas');
+      canvas.width = img.naturalWidth;
+      canvas.height = img.naturalHeight;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0);
+      aoCarregar(canvas.toDataURL('image/jpeg', 0.92));
+    } catch(erro){
+      console.log('Não foi possível converter a imagem ' + src + ':', erro);
+      aoCarregar(null);
+    }
+  };
+  img.onerror = function(){
+    console.log('Não foi possível carregar a imagem: ' + src);
+    aoCarregar(null);
+  };
+  img.src = src;
+}
+
+window.addEventListener('load', function(){
+  carregarImagemComoDataURL('foto.jpeg', function(dataUrl){ FOTO_DATAURL = dataUrl; });
+  carregarImagemComoDataURL('logo.jpeg', function(dataUrl){ LOGO_DATAURL = dataUrl; });
+});
+
+/* ==========================================================
+   ESTADO DA APLICAÇÃO
+   ========================================================== */
+let perguntaAtual = 0;
+let scoreTotal = 0;
+let dadosUsuario = { nome: "", email: "", whatsapp: "" };
+let perfilFinal = null;
+
+/* ==========================================================
+   NAVEGAÇÃO ENTRE TELAS
+   ========================================================== */
+function mostrarTela(id){
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function iniciarRastreio(){
+  perguntaAtual = 0;
+  scoreTotal = 0;
+  document.getElementById('progressContainer').style.display = 'block';
+  mostrarTela('screen-perguntas');
+  renderizarPergunta();
+}
+
+function renderizarPergunta(){
+  const p = perguntas[perguntaAtual];
+  document.getElementById('perguntaTexto').textContent = p.texto;
+
+  const container = document.getElementById('opcoesContainer');
+  container.innerHTML = '';
+  p.opcoes.forEach(opcao => {
+    const btn = document.createElement('button');
+    btn.className = 'opcao';
+    btn.textContent = opcao.texto;
+    btn.onclick = () => selecionarOpcao(opcao.pontos);
+    container.appendChild(btn);
+  });
+
+  const progresso = ((perguntaAtual) / perguntas.length) * 100;
+  document.getElementById('progressFill').style.width = progresso + '%';
+  document.getElementById('progressLabel').textContent = `Pergunta ${perguntaAtual + 1} de ${perguntas.length}`;
+}
+
+function selecionarOpcao(pontos){
+  scoreTotal += pontos;
+  perguntaAtual++;
+
+  if(perguntaAtual < perguntas.length){
+    renderizarPergunta();
+  } else {
+    document.getElementById('progressFill').style.width = '100%';
+    document.getElementById('progressLabel').textContent = 'Concluído!';
+    document.getElementById('progressContainer').style.display = 'none';
+    mostrarTela('screen-captura');
+  }
+}
+
+/* ==========================================================
+   VALIDAÇÃO DO FORMULÁRIO
+   ========================================================== */
+function validarNome(nome){
+  return nome.trim().length >= 5;
+}
+
+function validarEmail(email){
+  const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return regex.test(email.trim());
+}
+
+function validarWhatsapp(whats){
+  const somenteNumeros = whats.replace(/\D/g, '');
+  return /^\d{10,11}$/.test(somenteNumeros);
+}
+
+function validarEEnviar(){
+  const nomeInput = document.getElementById('inputNome');
+  const emailInput = document.getElementById('inputEmail');
+  const whatsInput = document.getElementById('inputWhatsapp');
+
+  const nome = nomeInput.value;
+  const email = emailInput.value;
+  const whats = whatsInput.value;
+
+  let valido = true;
+
+  if(!validarNome(nome)){
+    nomeInput.classList.add('erro');
+    document.getElementById('erroNome').classList.add('mostrar');
+    valido = false;
+  } else {
+    nomeInput.classList.remove('erro');
+    document.getElementById('erroNome').classList.remove('mostrar');
+  }
+
+  if(!validarEmail(email)){
+    emailInput.classList.add('erro');
+    document.getElementById('erroEmail').classList.add('mostrar');
+    valido = false;
+  } else {
+    emailInput.classList.remove('erro');
+    document.getElementById('erroEmail').classList.remove('mostrar');
+  }
+
+  if(!validarWhatsapp(whats)){
+    whatsInput.classList.add('erro');
+    document.getElementById('erroWhatsapp').classList.add('mostrar');
+    valido = false;
+  } else {
+    whatsInput.classList.remove('erro');
+    document.getElementById('erroWhatsapp').classList.remove('mostrar');
+  }
+
+  if(!valido) return;
+
+  dadosUsuario.nome = nome.trim();
+  dadosUsuario.email = email.trim();
+  dadosUsuario.whatsapp = whats.replace(/\D/g, '');
+
+  mostrarTela('screen-loading');
+  calcularPerfilEEnviar();
+}
+
+/* ==========================================================
+   CÁLCULO DO PERFIL + ENVIO PARA PLANILHA
+   ========================================================== */
+function calcularPerfilEEnviar(){
+  let chavePerfil;
+  if(scoreTotal <= 16){
+    chavePerfil = 'perfil1';
+  } else if(scoreTotal <= 23){
+    chavePerfil = 'perfil2';
+  } else {
+    chavePerfil = 'perfil3';
+  }
+  perfilFinal = perfis[chavePerfil];
+
+  const payload = {
+    nome: dadosUsuario.nome,
+    email: dadosUsuario.email,
+    whatsapp: dadosUsuario.whatsapp,
+    resultado: perfilFinal.nome,
+    score: scoreTotal
+  };
+
+  fetch(APPS_SCRIPT_URL, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify(payload)
+  }).catch(err => {
+    // Com mode 'no-cors' o navegador raramente reporta erro aqui, mas se a
+    // página estiver sendo aberta como arquivo local (file://) o envio pode
+    // ser bloqueado. Isso NÃO impede o usuário de ver o resultado.
+    console.log('Erro ao enviar dados para a planilha (não bloqueia o resultado):', err);
+  }).finally(() => {
+    exibirResultado();
+  });
+
+  // Segurança: caso o fetch demore ou trave, exibe resultado após um tempo máximo
+  setTimeout(exibirResultado, 2500);
+}
+
+let resultadoJaExibido = false;
+function exibirResultado(){
+  if(resultadoJaExibido) return;
+  resultadoJaExibido = true;
+
+  document.getElementById('resultadoIcone').textContent = perfilFinal.icone;
+  document.getElementById('resultadoPerfilNome').textContent = perfilFinal.nome;
+  document.getElementById('resultadoScore').textContent = `Sua pontuação: ${scoreTotal}/30 pontos`;
+  document.getElementById('resultadoDescricao').innerHTML = `<strong>${dadosUsuario.nome.split(' ')[0]}</strong>, ${perfilFinal.descricao}`;
+  document.getElementById('resultadoPratica').textContent = perfilFinal.pratica;
+
+  mostrarTela('screen-resultado');
+}
+
+/* ==========================================================
+   BOTÃO WHATSAPP
+   ========================================================== */
+function abrirWhatsapp(){
+  const mensagem = encodeURIComponent(`Olá Sueli! Fiz o Rastreio de Insegurança e meu resultado foi "${perfilFinal.nome}". Gostaria de agendar uma sessão.`);
+  window.open(`https://wa.me/${WHATSAPP_NUMERO}?text=${mensagem}`, '_blank');
+}
+
+/* ==========================================================
+   GERAÇÃO DO PDF (4 PÁGINAS)
+   ========================================================== */
+function desenharImagemCircular(doc, dataUrl, cx, cy, raio){
+  if(!dataUrl) return;
+  try{
+    doc.saveGraphicsState();
+    doc.circle(cx, cy, raio, null);
+    doc.clip();
+    doc.discardPath();
+    doc.addImage(dataUrl, 'JPEG', cx - raio, cy - raio, raio * 2, raio * 2);
+    doc.restoreGraphicsState();
+  } catch(erroClip){
+    // Fallback: se o clipping não for suportado, insere a imagem em quadrado
+    // com cantos arredondados, sem travar a geração do PDF.
+    console.log('Clipping circular indisponível, usando fallback:', erroClip);
+    try{
+      doc.addImage(dataUrl, 'JPEG', cx - raio, cy - raio, raio * 2, raio * 2);
+    } catch(erroImg){
+      console.log('Erro ao inserir imagem:', erroImg);
+    }
+  }
+}
+
+function gerarPDF(){
+  if(!window.jspdf){
+    alert('A biblioteca de geração de PDF ainda está carregando ou não pôde ser carregada. Verifique sua conexão com a internet e tente novamente em alguns segundos.');
+    return;
+  }
+  try{
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF('p', 'mm', 'a4');
+  const larguraPagina = 210;
+  const alturaPagina = 297;
+  const corRosaEscuro = [140, 58, 92];
+  const corRosaMedio = [227, 168, 192];
+  const corTexto = [74, 44, 58];
+  const corTextoSuave = [122, 85, 104];
+
+  const dataFormatada = new Date().toLocaleDateString('pt-BR');
+
+  /* ---------- PÁGINA 1: CAPA ---------- */
+  doc.setFillColor(253, 241, 245);
+  doc.rect(0, 0, larguraPagina, alturaPagina, 'F');
+
+  desenharImagemCircular(doc, LOGO_DATAURL, larguraPagina/2, 55, 20);
+
+  doc.setTextColor(...corRosaEscuro);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(22);
+  doc.text('RASTREIO DE INSEGURANÇA', larguraPagina/2, 100, { align: 'center' });
+
+  doc.setFontSize(14);
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(...corTextoSuave);
+  doc.text('Seu Resultado Personalizado', larguraPagina/2, 112, { align: 'center' });
+
+  doc.setDrawColor(...corRosaMedio);
+  doc.setLineWidth(0.5);
+  doc.line(larguraPagina/2 - 30, 125, larguraPagina/2 + 30, 125);
+
+  doc.setFontSize(12);
+  doc.setTextColor(...corTextoSuave);
+  doc.text('Preparado especialmente para:', larguraPagina/2, 145, { align: 'center' });
+
+  doc.setFontSize(18);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(...corTexto);
+  doc.text(dadosUsuario.nome, larguraPagina/2, 158, { align: 'center' });
+
+  doc.setFontSize(11);
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(...corTextoSuave);
+  doc.text(`Data: ${dataFormatada}`, larguraPagina/2, 170, { align: 'center' });
+
+  doc.setFontSize(11);
+  doc.setFont('helvetica', 'italic');
+  const fraseCapa = doc.splitTextToSize('"Compreender a raiz da insegurança é o primeiro passo para se relacionar de forma mais leve consigo mesma(o)."', 130);
+  doc.text(fraseCapa, larguraPagina/2, 230, { align: 'center' });
+
+  /* ---------- PÁGINA 2: RESULTADO ---------- */
+  doc.addPage();
+  doc.setFillColor(253, 241, 245);
+  doc.rect(0, 0, larguraPagina, alturaPagina, 'F');
+
+  doc.setFontSize(18);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(...corRosaEscuro);
+  doc.text('SEU PERFIL', larguraPagina/2, 30, { align: 'center' });
+
+  doc.setFontSize(20);
+  doc.setTextColor(...corTexto);
+  doc.text(perfilFinal.nome, larguraPagina/2, 45, { align: 'center' });
+
+  doc.setFontSize(12);
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(...corTextoSuave);
+  doc.text(`Sua pontuação: ${scoreTotal}/30 pontos`, larguraPagina/2, 55, { align: 'center' });
+
+  doc.setDrawColor(...corRosaMedio);
+  doc.line(25, 63, larguraPagina - 25, 63);
+
+  doc.setFontSize(11);
+  doc.setTextColor(...corTexto);
+  const descricaoLinhas = doc.splitTextToSize(perfilFinal.descricao, 160);
+  doc.text(descricaoLinhas, 25, 78);
+
+  let yAtual = 78 + (descricaoLinhas.length * 6) + 15;
+
+  doc.setFontSize(13);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(...corRosaEscuro);
+  doc.text('O QUE ISSO SIGNIFICA NA PRÁTICA', 25, yAtual);
+
+  yAtual += 10;
+  doc.setFontSize(11);
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(...corTexto);
+  const praticaLinhas = doc.splitTextToSize(perfilFinal.pratica, 160);
+  doc.text(praticaLinhas, 25, yAtual);
+
+  /* ---------- PÁGINA 3: ORIENTAÇÕES PRÁTICAS ---------- */
+  doc.addPage();
+  doc.setFillColor(253, 241, 245);
+  doc.rect(0, 0, larguraPagina, alturaPagina, 'F');
+
+  doc.setFontSize(18);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(...corRosaEscuro);
+  doc.text('ORIENTAÇÕES PRÁTICAS', larguraPagina/2, 30, { align: 'center' });
+
+  doc.setDrawColor(...corRosaMedio);
+  doc.line(25, 38, larguraPagina - 25, 38);
+
+  let yOrient = 52;
+  doc.setFontSize(11);
+  perfilFinal.orientacoes.forEach((item, index) => {
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(...corRosaEscuro);
+    doc.text(`${index + 1}.`, 25, yOrient);
+
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(...corTexto);
+    const linhasItem = doc.splitTextToSize(item, 150);
+    doc.text(linhasItem, 33, yOrient);
+
+    yOrient += (linhasItem.length * 6) + 8;
+  });
+
+  yOrient += 6;
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(12);
+  doc.setTextColor(...corRosaEscuro);
+  doc.text('RECURSOS RECOMENDADOS', 25, yOrient);
+
+  yOrient += 9;
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(10.5);
+  doc.setTextColor(...corTextoSuave);
+  const recursosLinhas = doc.splitTextToSize(recursosComuns, 160);
+  doc.text(recursosLinhas, 25, yOrient);
+
+  /* ---------- PÁGINA 4: SOBRE VOCÊ ---------- */
+  doc.addPage();
+  doc.setFillColor(253, 241, 245);
+  doc.rect(0, 0, larguraPagina, alturaPagina, 'F');
+
+  desenharImagemCircular(doc, FOTO_DATAURL, larguraPagina/2, 47, 22);
+
+  doc.setFontSize(17);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(...corRosaEscuro);
+  doc.text('Sueli Pedroso', larguraPagina/2, 85, { align: 'center' });
+
+  doc.setFontSize(12);
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(...corTextoSuave);
+  doc.text('Terapeuta Sistêmica', larguraPagina/2, 93, { align: 'center' });
+
+  doc.setDrawColor(...corRosaMedio);
+  doc.line(larguraPagina/2 - 30, 100, larguraPagina/2 + 30, 100);
+
+  doc.setFontSize(11);
+  doc.setTextColor(...corTexto);
+  const bioLinhas = doc.splitTextToSize(BIO, 150);
+  doc.text(bioLinhas, larguraPagina/2, 115, { align: 'center' });
+
+  let yContato = 115 + (bioLinhas.length * 6) + 15;
+
+  doc.setFontSize(11);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(...corRosaEscuro);
+  doc.text(`Instagram: ${INSTAGRAM}`, larguraPagina/2, yContato, { align: 'center' });
+
+  yContato += 8;
+  doc.text('WhatsApp: (42) 98435-2645', larguraPagina/2, yContato, { align: 'center' });
+
+  yContato += 20;
+  doc.setFillColor(...corRosaEscuro);
+  doc.roundedRect(larguraPagina/2 - 45, yContato - 8, 90, 14, 7, 7, 'F');
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(11);
+  doc.text('AGENDE SUA SESSÃO', larguraPagina/2, yContato + 1, { align: 'center' });
+
+  yContato += 30;
+  doc.setFont('helvetica', 'italic');
+  doc.setFontSize(10.5);
+  doc.setTextColor(...corTextoSuave);
+  const fraseFinal = doc.splitTextToSize('"Você não precisa mudar quem você é. Precisa entender por que age como age — e escolher, a partir daí."', 140);
+  doc.text(fraseFinal, larguraPagina/2, yContato, { align: 'center' });
+
+  /* ---------- SALVAR PDF ---------- */
+  const nomeArquivo = `resultado-${dadosUsuario.nome.trim().toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')}.pdf`;
+  doc.save(nomeArquivo);
+  } catch(erroGeral){
+    console.log('Erro ao gerar PDF:', erroGeral);
+    alert('Houve um problema ao gerar o PDF. Verifique se está acessando pelo link publicado (não pelo arquivo salvo no computador) e tente novamente.');
+  }
+}
+</script>
+
+</body>
+</html>
