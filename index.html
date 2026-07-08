@@ -43,17 +43,25 @@
   }
   .header-logo{
     display:flex;
+    align-items:center;
     justify-content:center;
+    gap:14px;
     padding:28px 0 10px;
     background: linear-gradient(135deg, var(--rosa-claro), var(--rosa-clarissimo));
   }
   .header-logo img{
-    width:80px;
-    height:80px;
     border-radius:50%;
     object-fit:cover;
     border:3px solid var(--branco);
     box-shadow:0 4px 14px rgba(142,58,92,0.25);
+  }
+  .header-logo .foto-topo{
+    width:88px;
+    height:88px;
+  }
+  .header-logo .logo-topo{
+    width:56px;
+    height:56px;
   }
   .screen{
     display:none;
@@ -287,7 +295,8 @@
 <div class="app" id="app">
 
   <div class="header-logo">
-    <img src="logo.jpeg" alt="Sueli Pedroso - Terapeuta Sistêmica">
+    <img class="foto-topo" src="foto.jpeg" alt="Sueli Pedroso">
+    <img class="logo-topo" src="logo.jpeg" alt="Sueli Pedroso - Terapeuta Sistêmica">
   </div>
 
   <div class="progress-container" id="progressContainer" style="display:none;">
@@ -931,10 +940,20 @@ function gerarPDF(){
 
   yContato += 20;
   doc.setFillColor(...corRosaEscuro);
-  doc.roundedRect(larguraPagina/2 - 45, yContato - 8, 90, 14, 7, 7, 'F');
+  const botaoX = larguraPagina/2 - 45;
+  const botaoY = yContato - 8;
+  const botaoLargura = 90;
+  const botaoAltura = 14;
+  doc.roundedRect(botaoX, botaoY, botaoLargura, botaoAltura, 7, 7, 'F');
   doc.setTextColor(255, 255, 255);
   doc.setFontSize(11);
   doc.text('AGENDE SUA SESSÃO', larguraPagina/2, yContato + 1, { align: 'center' });
+
+  // Torna o botão clicável: ao clicar, abre o WhatsApp com mensagem pronta
+  const mensagemWhatsPDF = encodeURIComponent(`Olá Sueli! Vi meu resultado no Rastreio de Insegurança e gostaria de agendar uma sessão.`);
+  doc.link(botaoX, botaoY, botaoLargura, botaoAltura, {
+    url: `https://wa.me/${WHATSAPP_NUMERO}?text=${mensagemWhatsPDF}`
+  });
 
   yContato += 30;
   doc.setFont('helvetica', 'italic');
